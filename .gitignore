@@ -124,3 +124,19 @@ _modules/*
 
 /results/
 /phpunit*.xml
+
+#-------------------------
+# Frontend and Local Uploads
+#-------------------------
+frontend/node_modules/
+public/uploads/*
+!public/uploads/index.html
+
+#-------------------------
+# Android Build Files
+#-------------------------
+android/.gradle/
+android/local.properties
+android/**/build/
+*.apk
+*.aar

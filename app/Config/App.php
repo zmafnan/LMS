@@ -199,4 +199,12 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    // Cookie configuration properties for CodeIgniter 4.2.x compatibility
+    public $cookiePrefix = '';
+    public $cookieDomain = '';
+    public $cookiePath = '/';
+    public $cookieSecure = false;
+    public $cookieHTTPOnly = true;
+    public $cookieSameSite = 'Lax';
 }

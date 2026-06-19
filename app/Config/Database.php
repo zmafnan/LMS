@@ -190,6 +190,50 @@ class Database extends Config
         ],
     ];
 
+    public array $audit6s = [
+        'DSN'          => '',
+        'hostname'     => '127.0.0.1',
+        'username'     => 'postgres',
+        'password'     => '12345',
+        'database'     => 'audit6s',
+        'DBDriver'     => 'Postgre',
+        'DBPrefix'     => '',
+        'pConnect'     => false,
+        'DBDebug'      => true,
+        'charset'      => 'utf8',
+        'swapPre'      => '',
+        'failover'     => [],
+        'port'         => 5432,
+        'schema'       => 'public',
+        'dateFormat'   => [
+            'date'     => 'Y-m-d',
+            'datetime' => 'Y-m-d H:i:s',
+            'time'     => 'H:i:s',
+        ],
+    ];
+
+    public array $kaizen = [
+        'DSN'          => '',
+        'hostname'     => '127.0.0.1',
+        'username'     => 'postgres',
+        'password'     => '12345',
+        'database'     => 'kaizen_db',
+        'DBDriver'     => 'Postgre',
+        'DBPrefix'     => '',
+        'pConnect'     => false,
+        'DBDebug'      => true,
+        'charset'      => 'utf8',
+        'swapPre'      => '',
+        'failover'     => [],
+        'port'         => 5432,
+        'schema'       => 'public',
+        'dateFormat'   => [
+            'date'     => 'Y-m-d',
+            'datetime' => 'Y-m-d H:i:s',
+            'time'     => 'H:i:s',
+        ],
+    ];
+
     public function __construct()
     {
         parent::__construct();

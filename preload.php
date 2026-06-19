@@ -9,9 +9,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use CodeIgniter\Boot;
-use Config\Paths;
-
 /*
  *---------------------------------------------------------------
  * Sample file for Preloading
@@ -32,6 +29,19 @@ require __DIR__ . '/app/Config/Paths.php';
 // Path to the front controller
 define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
 
+/**
+ * See https://www.php.net/manual/en/function.str-contains.php#126277
+ */
+if (! function_exists('str_contains')) {
+    /**
+     * Polyfill of str_contains()
+     */
+    function str_contains(string $haystack, string $needle): bool
+    {
+        return empty($needle) || strpos($haystack, $needle) !== false;
+    }
+}
+
 class preload
 {
     /**
@@ -39,28 +49,23 @@ class preload
      */
     private array $paths = [
         [
-            'include' => __DIR__ . '/vendor/codeigniter4/framework/system', // Change this path if using manual installation
+            'include' => __DIR__ . '/vendor/codeigniter4/framework/system',
             'exclude' => [
                 // Not needed if you don't use them.
                 '/system/Database/OCI8/',
                 '/system/Database/Postgre/',
-                '/system/Database/SQLite3/',
                 '/system/Database/SQLSRV/',
-                // Not needed for web apps.
+                // Not needed.
                 '/system/Database/Seeder.php',
                 '/system/Test/',
+                '/system/Language/',
                 '/system/CLI/',
                 '/system/Commands/',
                 '/system/Publisher/',
                 '/system/ComposerScripts.php',
-                // Not Class/Function files.
-                '/system/Config/Routes.php',
-                '/system/Language/',
-                '/system/bootstrap.php',
-                '/system/util_bootstrap.php',
-                '/system/rewrite.php',
                 '/Views/',
                 // Errors occur.
+                '/system/Config/Routes.php',
                 '/system/ThirdParty/',
             ],
         ],
@@ -71,18 +76,16 @@ class preload
         $this->loadAutoloader();
     }
 
-    private function loadAutoloader(): void
+    private function loadAutoloader()
     {
-        $paths = new Paths();
-        require rtrim($paths->systemDirectory, '\\/ ') . DIRECTORY_SEPARATOR . 'Boot.php';
-
-        Boot::preload($paths);
+        $paths = new Config\Paths();
+        require rtrim($paths->systemDirectory, '\\/ ') . DIRECTORY_SEPARATOR . 'bootstrap.php';
     }
 
     /**
      * Load PHP files.
      */
-    public function load(): void
+    public function load()
     {
         foreach ($this->paths as $path) {
             $directory = new RecursiveDirectoryIterator($path['include']);
@@ -90,7 +93,7 @@ class preload
             $phpFiles  = new RegexIterator(
                 $fullTree,
                 '/.+((?<!Test)+\.php$)/i',
-                RecursiveRegexIterator::GET_MATCH,
+                RecursiveRegexIterator::GET_MATCH
             );
 
             foreach ($phpFiles as $key => $file) {
@@ -101,9 +104,7 @@ class preload
                 }
 
                 require_once $file[0];
-                // Uncomment only for debugging (to inspect which files are included).
-                // Never use this in production - preload scripts must not generate output.
-                // echo 'Loaded: ' . $file[0] . "\n";
+                echo 'Loaded: ' . $file[0] . "\n";
             }
         }
     }
