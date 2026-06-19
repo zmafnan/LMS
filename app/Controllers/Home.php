@@ -83,7 +83,7 @@ class Home extends BaseController
         $reactBaseUrl = rtrim(base_url(), '/') . '/react/';
         $html = str_replace('src="./assets/', 'src="' . $reactBaseUrl . 'assets/', $html);
         $html = str_replace('href="./assets/', 'href="' . $reactBaseUrl . 'assets/', $html);
-        $html = str_replace('href="/react/favicon.svg"', 'href="' . $reactBaseUrl . 'favicon.svg"', $html);
+        $html = str_replace('href="/react/favicon.png"', 'href="' . $reactBaseUrl . 'favicon.png"', $html);
         
         return $html;
     }
