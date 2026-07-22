@@ -280,7 +280,7 @@ class ScheduleController extends BaseController
             fputcsv($output, []); // empty row
 
             // Write Headers
-            fputcsv($output, ["No", "Department", "Audit Date", "Auditor", "Lean Facilitator"]);
+            fputcsv($output, ["No", "Department", "Department Type", "Audit Date", "Auditor", "Lean Facilitator", "Status"]);
 
             // Write Data
             foreach ($schedules as $index => $schedule) {
@@ -288,9 +288,11 @@ class ScheduleController extends BaseController
                 fputcsv($output, [
                     $index + 1,
                     $schedule['department_name'],
+                    ucfirst($schedule['department_type'] ?? ''),
                     $formattedDate,
                     $schedule['auditor_name'],
-                    $schedule['lean_facilitator_name']
+                    $schedule['lean_facilitator_name'],
+                    ucfirst($schedule['status'] ?? '')
                 ]);
             }
 

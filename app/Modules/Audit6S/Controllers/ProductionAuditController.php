@@ -73,7 +73,7 @@ class ProductionAuditController extends BaseController
                 ];
             }
 
-            if ($this->request->getGet('format') === 'excel') {
+            if ($this->request->getGet('format') === 'excel' || $this->request->getGet('format') === 'csv') {
                 $monthName = date("F", mktime(0, 0, 0, $month, 10));
                 $fileName = "6s-ranking-production-" . $year . "-" . $month . ".csv";
 
@@ -85,13 +85,23 @@ class ProductionAuditController extends BaseController
 
                 fputcsv($output, ["Ranking 6S Audit Production - $monthName $year"]);
                 fputcsv($output, []);
-                fputcsv($output, ["Rank", "Department", "Final Score"]);
+                fputcsv($output, ["Rank", "Department", "Audit Date", "Auditor", "Lean Facilitator", "1S (Sort)", "2S (Set in Order)", "3S (Shine)", "4S (Standardize)", "5S (Sustain)", "6S (Safety)", "Final Score"]);
 
                 foreach ($formatted as $index => $audit) {
                     $finalScore = ($audit['sort_score'] + $audit['set_in_order_score'] + $audit['shine_score'] + $audit['standardize_score'] + $audit['sustain_score'] + $audit['safety_score']) / 6;
+                    $formattedDate = !empty($audit['audit_date']) ? date('d F Y', strtotime($audit['audit_date'])) : '-';
                     fputcsv($output, [
                         $index + 1,
                         $audit['Department']['name'],
+                        $formattedDate,
+                        $audit['auditor_name'] ?? '-',
+                        $audit['lean_facilitator_name'] ?? '-',
+                        number_format($audit['sort_score'] ?? 0, 2),
+                        number_format($audit['set_in_order_score'] ?? 0, 2),
+                        number_format($audit['shine_score'] ?? 0, 2),
+                        number_format($audit['standardize_score'] ?? 0, 2),
+                        number_format($audit['sustain_score'] ?? 0, 2),
+                        number_format($audit['safety_score'] ?? 0, 2),
                         number_format($finalScore, 2)
                     ]);
                 }
