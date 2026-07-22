@@ -242,7 +242,7 @@ export default function Schedule() {
 
       // Create a blob URL
       const blob = new Blob([response.data], {
-        type: "text/csv;charset=utf-8;",
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       })
       const blobUrl = window.URL.createObjectURL(blob)
 
@@ -250,7 +250,7 @@ export default function Schedule() {
       const link = document.createElement("a")
       const monthName = new Date(0, month - 1).toLocaleString("default", { month: "long" })
       link.href = blobUrl
-      link.download = `Audit_Schedule_${monthName}_${year}.csv`
+      link.download = `Audit_Schedule_${monthName}_${year}.xlsx`
       document.body.appendChild(link)
       link.click()
 

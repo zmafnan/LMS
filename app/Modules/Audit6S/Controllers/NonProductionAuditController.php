@@ -73,40 +73,73 @@ class NonProductionAuditController extends BaseController
                 ];
             }
 
-            if ($this->request->getGet('format') === 'excel' || $this->request->getGet('format') === 'csv') {
+            if ($this->request->getGet('format') === 'excel') {
                 $monthName = date("F", mktime(0, 0, 0, $month, 10));
-                $fileName = "6s-ranking-non-production-" . $year . "-" . $month . ".csv";
+                $fileName = "6s-ranking-non-production-" . $year . "-" . $month . ".xlsx";
 
-                header('Content-Type: text/csv; charset=utf-8');
-                header('Content-Disposition: attachment; filename="' . $fileName . '"');
+                $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+                $sheet->setTitle('6S Audit Non-Production');
 
-                $output = fopen('php://output', 'w');
-                fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM
+                // Header title
+                $sheet->setCellValue('A1', "Ranking 6S Audit Non-Production - $monthName $year");
+                $sheet->mergeCells('A1:L1');
+                $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+                $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-                fputcsv($output, ["Ranking 6S Audit Non-Production - $monthName $year"]);
-                fputcsv($output, []);
-                fputcsv($output, ["Rank", "Department", "Audit Date", "Auditor", "Lean Facilitator", "1S (Sort)", "2S (Set in Order)", "3S (Shine)", "4S (Standardize)", "5S (Sustain)", "6S (Safety)", "Final Score"]);
+                // Table headers
+                $headers = ["Rank", "Department", "Audit Date", "Auditor", "Lean Facilitator", "1S (Sort)", "2S (Set in Order)", "3S (Shine)", "4S (Standardize)", "5S (Sustain)", "6S (Safety)", "Final Score"];
+                $col = 'A';
+                foreach ($headers as $headerText) {
+                    $sheet->setCellValue($col . '3', $headerText);
+                    $col++;
+                }
 
+                // Header styling
+                $headerStyle = [
+                    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                    'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '1F4E78']],
+                    'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+                ];
+                $sheet->getStyle('A3:L3')->applyFromArray($headerStyle);
+
+                // Data rows
+                $rowNum = 4;
                 foreach ($formatted as $index => $audit) {
                     $finalScore = ($audit['sort_score'] + $audit['set_in_order_score'] + $audit['shine_score'] + $audit['standardize_score'] + $audit['sustain_score'] + $audit['safety_score']) / 6;
                     $formattedDate = !empty($audit['audit_date']) ? date('d F Y', strtotime($audit['audit_date'])) : '-';
-                    fputcsv($output, [
-                        $index + 1,
-                        $audit['Department']['name'],
-                        $formattedDate,
-                        $audit['auditor_name'] ?? '-',
-                        $audit['lean_facilitator_name'] ?? '-',
-                        number_format($audit['sort_score'] ?? 0, 2),
-                        number_format($audit['set_in_order_score'] ?? 0, 2),
-                        number_format($audit['shine_score'] ?? 0, 2),
-                        number_format($audit['standardize_score'] ?? 0, 2),
-                        number_format($audit['sustain_score'] ?? 0, 2),
-                        number_format($audit['safety_score'] ?? 0, 2),
-                        number_format($finalScore, 2)
-                    ]);
+
+                    $sheet->setCellValue('A' . $rowNum, $index + 1);
+                    $sheet->setCellValue('B' . $rowNum, $audit['Department']['name']);
+                    $sheet->setCellValue('C' . $rowNum, $formattedDate);
+                    $sheet->setCellValue('D' . $rowNum, $audit['auditor_name'] ?? '-');
+                    $sheet->setCellValue('E' . $rowNum, $audit['lean_facilitator_name'] ?? '-');
+                    $sheet->setCellValue('F' . $rowNum, (float)($audit['sort_score'] ?? 0));
+                    $sheet->setCellValue('G' . $rowNum, (float)($audit['set_in_order_score'] ?? 0));
+                    $sheet->setCellValue('H' . $rowNum, (float)($audit['shine_score'] ?? 0));
+                    $sheet->setCellValue('I' . $rowNum, (float)($audit['standardize_score'] ?? 0));
+                    $sheet->setCellValue('J' . $rowNum, (float)($audit['sustain_score'] ?? 0));
+                    $sheet->setCellValue('K' . $rowNum, (float)($audit['safety_score'] ?? 0));
+                    $sheet->setCellValue('L' . $rowNum, (float)number_format($finalScore, 2));
+
+                    $rowNum++;
                 }
 
-                fclose($output);
+                // Auto size columns
+                foreach (range('A', 'L') as $colLetter) {
+                    $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+                }
+
+                if (ob_get_level()) {
+                    ob_end_clean();
+                }
+
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment;filename="' . $fileName . '"');
+                header('Cache-Control: max-age=0');
+
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+                $writer->save('php://output');
                 exit();
             }
 

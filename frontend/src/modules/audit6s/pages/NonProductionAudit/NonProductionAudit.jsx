@@ -100,11 +100,11 @@ export default function NonProductionAudit() {
       });
 
       // Create download link
-      const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
+      const blob = new Blob([response.data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `non-production-audit-report-${year}-${month}.csv`);
+      link.setAttribute('download', `non-production-audit-report-${year}-${month}.xlsx`);
       document.body.appendChild(link);
       link.click();
       link.remove();

@@ -11,7 +11,8 @@
     },
     "require": {
         "php": "^7.4 || ^8.0 || ^8.1",
-        "codeigniter4/framework": "4.2.11"
+        "codeigniter4/framework": "4.2.11",
+        "phpoffice/phpspreadsheet": "1.29"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9",

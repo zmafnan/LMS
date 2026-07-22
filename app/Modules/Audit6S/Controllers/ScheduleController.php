@@ -263,40 +263,64 @@ class ScheduleController extends BaseController
             $schedules = $builder->get()->getResultArray();
 
             $monthName = $month ? date("F", mktime(0, 0, 0, $month, 10)) : "All";
-            $fileName = "Audit_Schedule_" . $monthName . "_" . ($year ?? "All") . ".csv";
+            $fileName = "Audit_Schedule_" . $monthName . "_" . ($year ?? "All") . ".xlsx";
 
-            // Set headers for CSV download
-            header('Content-Type: text/csv; charset=utf-8');
-            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setTitle('Audit Schedule');
 
-            $output = fopen('php://output', 'w');
-            
-            // UTF-8 BOM
-            fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+            // Header title
+            $sheet->setCellValue('A1', "AUDIT SCHEDULE - $monthName " . ($year ?? "All"));
+            $sheet->mergeCells('A1:G1');
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+            $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-            // Write Title
-            fputcsv($output, ["AUDIT SCHEDULE"]);
-            fputcsv($output, ["$monthName " . ($year ?? "")]);
-            fputcsv($output, []); // empty row
-
-            // Write Headers
-            fputcsv($output, ["No", "Department", "Department Type", "Audit Date", "Auditor", "Lean Facilitator", "Status"]);
-
-            // Write Data
-            foreach ($schedules as $index => $schedule) {
-                $formattedDate = date('d F Y', strtotime($schedule['audit_date']));
-                fputcsv($output, [
-                    $index + 1,
-                    $schedule['department_name'],
-                    ucfirst($schedule['department_type'] ?? ''),
-                    $formattedDate,
-                    $schedule['auditor_name'],
-                    $schedule['lean_facilitator_name'],
-                    ucfirst($schedule['status'] ?? '')
-                ]);
+            // Table headers
+            $headers = ["No", "Department", "Department Type", "Audit Date", "Auditor", "Lean Facilitator", "Status"];
+            $col = 'A';
+            foreach ($headers as $headerText) {
+                $sheet->setCellValue($col . '3', $headerText);
+                $col++;
             }
 
-            fclose($output);
+            // Header styling
+            $headerStyle = [
+                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '1F4E78']],
+                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+            ];
+            $sheet->getStyle('A3:G3')->applyFromArray($headerStyle);
+
+            // Data rows
+            $rowNum = 4;
+            foreach ($schedules as $index => $schedule) {
+                $formattedDate = date('d F Y', strtotime($schedule['audit_date']));
+                $sheet->setCellValue('A' . $rowNum, $index + 1);
+                $sheet->setCellValue('B' . $rowNum, $schedule['department_name']);
+                $sheet->setCellValue('C' . $rowNum, ucfirst($schedule['department_type'] ?? ''));
+                $sheet->setCellValue('D' . $rowNum, $formattedDate);
+                $sheet->setCellValue('E' . $rowNum, $schedule['auditor_name']);
+                $sheet->setCellValue('F' . $rowNum, $schedule['lean_facilitator_name']);
+                $sheet->setCellValue('G' . $rowNum, ucfirst($schedule['status'] ?? ''));
+
+                $rowNum++;
+            }
+
+            // Auto size columns
+            foreach (range('A', 'G') as $colLetter) {
+                $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+            }
+
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="' . $fileName . '"');
+            header('Cache-Control: max-age=0');
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save('php://output');
             exit();
         } catch (\Exception $e) {
             return $this->response->setJSON([
