@@ -42,10 +42,21 @@ export default function ProductionAuditQuickEdit() {
   const [photos, setPhotos] = useState([])
   const [newPhotos, setNewPhotos] = useState([])
 
-  // Helper function to get the base URL from the API URL
-  const getBaseUrl = () => {
-    const fullUrl = api.defaults.baseURL
-    return fullUrl.endsWith("/api") ? fullUrl.slice(0, -4) : fullUrl
+  // Helper function to resolve photo URL
+  const getPhotoUrl = (photo) => {
+    if (!photo) return "/placeholder.svg"
+    if (photo.startsWith("http://") || photo.startsWith("https://") || photo.startsWith("data:")) {
+      return photo
+    }
+    let baseUrl = api.defaults.baseURL || ""
+    const apiIndex = baseUrl.indexOf("/api")
+    if (apiIndex !== -1) {
+      baseUrl = baseUrl.substring(0, apiIndex)
+    } else {
+      baseUrl = ""
+    }
+    const cleanPath = photo.startsWith("/") ? photo : `/${photo}`
+    return `${baseUrl}${cleanPath}`
   }
 
   useEffect(() => {
@@ -177,12 +188,11 @@ export default function ProductionAuditQuickEdit() {
             {photos.map((photo, index) => (
               <div key={`existing-${index}`} style={{ position: "relative" }}>
                 <Image
-                  src={`${getBaseUrl()}${photo}`}
+                  src={getPhotoUrl(photo)}
                   alt={`Audit photo ${index + 1}`}
                   style={{ width: "100%", height: "auto" }}
                   onError={(e) => {
-                    console.error(`Failed to load image: ${getBaseUrl()}${photo}`)
-                    e.target.src = "/placeholder.svg" // Fallback image
+                    console.error(`Failed to load image: ${getPhotoUrl(photo)}`)
                   }}
                 />
                 <ActionIcon

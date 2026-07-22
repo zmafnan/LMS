@@ -52,10 +52,21 @@ export default function ProductionAuditPreview() {
     </Paper>
   )
 
-  // Helper function to get the base URL from the API URL
-  const getBaseUrl = () => {
-    const fullUrl = api.defaults.baseURL
-    return fullUrl.endsWith("/api") ? fullUrl.slice(0, -4) : fullUrl
+  // Helper function to resolve photo URL
+  const getPhotoUrl = (photo) => {
+    if (!photo) return "/placeholder.svg"
+    if (photo.startsWith("http://") || photo.startsWith("https://") || photo.startsWith("data:")) {
+      return photo
+    }
+    let baseUrl = api.defaults.baseURL || ""
+    const apiIndex = baseUrl.indexOf("/api")
+    if (apiIndex !== -1) {
+      baseUrl = baseUrl.substring(0, apiIndex)
+    } else {
+      baseUrl = ""
+    }
+    const cleanPath = photo.startsWith("/") ? photo : `/${photo}`
+    return `${baseUrl}${cleanPath}`
   }
 
   const downloadPdf = () => {
@@ -304,18 +315,14 @@ export default function ProductionAuditPreview() {
 
                   console.log("Photo URLs:", photoUrls) // Debug log
 
-                  // Get the base URL for the backend
-                  const baseUrl = getBaseUrl()
-
                   return photoUrls.map((url, index) => (
                     <div key={index}>
                       <Image
-                        src={`${baseUrl}${url}` || "/placeholder.svg"}
+                        src={getPhotoUrl(url)}
                         alt={`Finding ${index + 1}`}
                         radius="md"
                         onError={(e) => {
-                          console.error(`Failed to load image: ${baseUrl}${url}`)
-                          e.target.src = "/placeholder.svg" // Fallback image
+                          console.error(`Failed to load image: ${getPhotoUrl(url)}`)
                         }}
                       />
                       <Text size="sm" mt="xs" c="dimmed">
