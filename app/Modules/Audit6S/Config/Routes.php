@@ -30,14 +30,14 @@ $routes->group('api/audit6s', ['filter' => 'jwt'], function($routes) {
     $routes->get('production-audits', '\Modules\Audit6S\Controllers\ProductionAuditController::getAllAudits');
     $routes->get('production-audits/(:num)', '\Modules\Audit6S\Controllers\ProductionAuditController::getAuditById/$1');
     $routes->post('production-audits', '\Modules\Audit6S\Controllers\ProductionAuditController::createAudit');
-    $routes->put('production-audits/(:num)', '\Modules\Audit6S\Controllers\ProductionAuditController::updateAudit/$1');
+    $routes->match(['put', 'post'], 'production-audits/(:num)', '\Modules\Audit6S\Controllers\ProductionAuditController::updateAudit/$1');
     $routes->delete('production-audits/(:num)', '\Modules\Audit6S\Controllers\ProductionAuditController::deleteAudit/$1');
-
+    
     // Non-Production Audit routes
     $routes->get('non-production-audits/previous', '\Modules\Audit6S\Controllers\NonProductionAuditController::getPreviousAudit');
     $routes->get('non-production-audits', '\Modules\Audit6S\Controllers\NonProductionAuditController::getAllAudits');
     $routes->get('non-production-audits/(:num)', '\Modules\Audit6S\Controllers\NonProductionAuditController::getAuditById/$1');
     $routes->post('non-production-audits', '\Modules\Audit6S\Controllers\NonProductionAuditController::createAudit');
-    $routes->put('non-production-audits/(:num)', '\Modules\Audit6S\Controllers\NonProductionAuditController::updateAudit/$1');
+    $routes->match(['put', 'post'], 'non-production-audits/(:num)', '\Modules\Audit6S\Controllers\NonProductionAuditController::updateAudit/$1');
     $routes->delete('non-production-audits/(:num)', '\Modules\Audit6S\Controllers\NonProductionAuditController::deleteAudit/$1');
 });

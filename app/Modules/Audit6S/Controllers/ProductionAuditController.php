@@ -301,13 +301,25 @@ class ProductionAuditController extends BaseController
             }
 
             $post = $this->request->getPost();
+            if (empty($post)) {
+                $json = $this->request->getJSON(true);
+                if (!empty($json)) {
+                    $post = $json;
+                } else {
+                    $post = $this->request->getRawInput() ?: [];
+                }
+            }
 
             // Handle existing photos
             $existingPhotos = [];
             if (isset($post['existing_photos'])) {
-                $existingPhotos = json_decode($post['existing_photos'], true) ?: [];
+                if (is_string($post['existing_photos'])) {
+                    $existingPhotos = json_decode($post['existing_photos'], true) ?: [];
+                } elseif (is_array($post['existing_photos'])) {
+                    $existingPhotos = $post['existing_photos'];
+                }
             } else {
-                $existingPhotos = json_decode($audit['photo_url'], true) ?: [];
+                $existingPhotos = json_decode($audit['photo_url'] ?? '[]', true) ?: [];
             }
 
             // Handle new uploads

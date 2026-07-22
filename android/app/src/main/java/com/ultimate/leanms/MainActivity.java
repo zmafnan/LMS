@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     
     // Default URL for the application (change to production URL when deploying)
-    private static final String APP_URL = "https://localhost/Lean_Management_System/public/";
+    private static final String APP_URL = "https://ultimate-noble.local/Lean_Management_System/public/";
 
     private ValueCallback<Uri[]> mUploadMessage;
     private String mCameraPhotoPath;
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 // Keep navigation within the app if it's our domain
-                if (url.contains("localhost") || url.contains("Lean_Management_System")) {
+                if (url.contains("ultimate-noble.local") || url.contains("Lean_Management_System")) {
                     return false;
                 }
                 // Open external links in external browser

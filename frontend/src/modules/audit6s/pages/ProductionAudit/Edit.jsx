@@ -106,7 +106,7 @@ export default function ProductionAuditQuickEdit() {
     })
 
     try {
-      await api.put(`/production-audits/${id}`, formData, {
+      await api.post(`/production-audits/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       notifications.show({

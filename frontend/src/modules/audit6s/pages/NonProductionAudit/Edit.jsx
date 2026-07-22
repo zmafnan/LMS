@@ -107,7 +107,7 @@ export default function NonProductionAuditQuickEdit() {
 
     try {
       // Changed from production-audits to non-production-audits
-      const response = await api.put(`/non-production-audits/${id}`, formData, {
+      const response = await api.post(`/non-production-audits/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
 
