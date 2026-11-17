@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CHECKLIST AUDIT 6S OFFICE/NON PRODUCTION</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        font-size: 10px;
+      }
+      .checklist-container {
+        border: 1px solid #000;
+        width: 100%;
+        height: 95vh;
+      }
+      .header {
+        display: flex;
+        height: 60px;
+        border-bottom: 1px solid #000;
+      }
+
+      .info {
+        flex: 1;
+        padding: 10px;
+        border-right: 1px solid #000;
+      }
+      .rating {
+        flex: 0.5;
+        padding: 10px;
+      }
+      .title {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        font-weight: bold;
+        font-size: 14px;
+        padding: 10px;
+        border-right: 1px solid #000;
+        width: 60%;
+      }
+
+      .main-title {
+        flex: 1;
+        width: 101%;
+        border-bottom: 1px solid #000; /* Garis pemisah antara judul dan audit goal */
+        padding: 5px; /* Beri jarak antara teks dan garis */
+      }
+
+      .audit-goal {
+        /* margin-top: 10px; */
+        font-size: 12px;
+        font-weight: bold;
+        /* margin-bottom: 10px; */
+        padding: 5px; /* Beri jarak antara garis dan teks */
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid #000;
+        padding: 6px;
+        text-align: left;
+        vertical-align: top;
+        min-height: 50px; /* Atur tinggi minimum */
+        vertical-align: middle; /* Tengahkan teks */
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .category {
+        width: 15%;
+        font-weight: bold;
+      }
+      .criteria {
+        width: 45%;
+      }
+      .score {
+        width: 8%;
+        text-align: center;
+      }
+      .total {
+        width: 12%;
+        text-align: center;
+      }
+      .previous {
+        width: 20%;
+        text-align: center;
+      }
+      .signatures {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+      }
+
+      .signature-box {
+        border: 1px solid #000;
+        width: 250px;
+        height: 120px;
+        margin-left: 10px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 5px;
+      }
+
+      .signature-img {
+        max-width: 100%;
+        max-height: 80px;
+        object-fit: contain;
+        margin: 5px 0;
+      }
+
+      .signature-title {
+        padding: 5px 0 0;
+        font-size: 12px;
+        font-weight: bold;
+        border-top: 1px solid #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="checklist-container">
+      <div class="header">
+        <div class="title">
+          <div class="main-title">CHECKLIST AUDIT 6S OFFICE/NON PRODUCTION</div>
+          <div class="audit-goal">
+            <strong>Audit Goal:</strong> Untuk Meng-Audit inisiatif dalam
+            menyesuaikan dengan standar 6S, mengidentifikasi area dimana 6S
+            dijaga dengan baik
+          </div>
+        </div>
+        <div class="info">
+          <strong>Area:</strong> {{audit.Department.name}}<br />
+          <strong>Auditor:</strong> {{audit.auditor_name}}<br />
+          <strong>Periode:</strong> {{auditDateFormatted}}
+        </div>
+        <div class="rating">
+          <div>1 = SANGAT TIDAK BAIK</div>
+          <div>2 = TIDAK BAIK</div>
+          <div>3 = BAIK</div>
+          <div>4 = SANGAT BAIK</div>
+        </div>
+      </div>
+
+      <table>
+        <tr>
+          <th class="category">KATEGORI</th>
+          <th class="criteria">Standar Criteria</th>
+          <th class="total">Total Score</th>
+          <th class="previous">Temuan Sebelumnya</th>
+        </tr>
+        <tr>
+          <td class="category" rowspan="4">
+            SORT<br />Pisahkan dan hilangkan segala sesuatu yang tidak
+            diperlukan di area kerja
+          </td>
+          <td>
+            Pisahkan barang-barang yang tidak ada hubungannya dengan pekerjaan di area kerja
+          </td>
+          <!-- <td class="score">{{ audit.sort_score }}</td> -->
+          <td class="total" rowspan="4">{{ audit.sort_score }}</td>
+          <td class="previous" rowspan="4">{{ audit.previous_findings }}</td>
+        </tr>
+        <tr>
+          <td>
+            Barang yang tidak ada hubungan dengan pekerjaan disimpan pada tempatnya
+          </td>
+          <!-- <td class="score">{{ audit.sort_score }}</td> -->
+        </tr>
+        <tr>
+          <td>Tidak ada barang pribadi di atas dan dibawah meja</td>
+          <!-- <td class="score">{{ audit.sort_score }}</td> -->
+        </tr>
+        <tr>
+          <td>Dokumen-dokumen yang berbeda diatas meja terdapat visual yang jelas</td>
+          <!-- <td class="score">{{ audit.sort_score }}</td> -->
+        </tr>
+
+        <tr>
+          <td class="category" rowspan="4">
+            SET IN ORDER<br />Susun dan tempatkan dokumen dan perlengkapan kerja pada tempatnya
+          </td>
+          <td>
+            Dokumen tersusun rapi
+          </td>
+          <!-- <td class="score">{{audit.set_in_order_score}}</td> -->
+          <td class="total" rowspan="4">{{audit.set_in_order_score}}</td>
+          <td class="previous" rowspan="4"></td>
+        </tr>
+        <tr>
+          <td>Dokumen disimpan pada tempatnya (bindex, odner)</td>
+          <!-- <td class="score">{{audit.set_in_order_score}}</td> -->
+        </tr>
+        <tr>
+          <td>Perlengkapan kerja disusun secara rapi</td>
+          <!-- <td class="score">{{audit.set_in_order_score}}</td> -->
+        </tr>
+        <tr>
+          <td>Perlengkapan kerja disusun pada tempatnya</td>
+          <!-- <td class="score">{{audit.set_in_order_score}}</td> -->
+        </tr>
+
+        <tr>
+          <td class="category" rowspan="4">
+            SHINE<br />Segala sesuatu terjaga kebersihannya
+          </td>
+          <td>Lantai, dinding, meja bersih dari debu sampah dan sarang laba-laba</td>
+          <!-- <td class="score">{{audit.shine_score}}</td> -->
+          <td class="total" rowspan="4">{{audit.shine_score}}</td>
+          <td class="previous" rowspan="3"></td>
+        </tr>
+        <tr>
+          <td>
+            Dokumen dan peralatan kerja bersih dari debu, sampah dan sarang laba-laba
+          </td>
+          <!-- <td class="score">{{audit.shine_score}}</td> -->
+        </tr>
+        <tr>
+          <td>
+            Tersedianya alat kebersihan disetiap area kerja dalam kondisi balk dan berfungsi (Kemoceng, dll)
+          </td>
+          <!-- <td class="score">{{audit.shine_score}}</td> -->
+        </tr>
+        <tr>
+          <td>
+            Kondisi Visual display Bersih dan tidak rusak
+          </td>
+          <!-- <td class="score">{{audit.shine_score}}</td> -->
+          <td class="previous">Temuan Sekarang</td>
+        </tr>
+
+        <tr>
+          <td class="category" rowspan="4">
+            STANDARDIZED<br />Tempatkan dokumen diarea yang sudah ditetapkan
+            dengan jumlah sesuai batas minimal dan maximal
+          </td>
+          <td>Terdapat tempat dokumen</td>
+          <!-- <td class="score">{{audit.standardize_score}}</td> -->
+          <td class="total" rowspan="4">{{audit.standardize_score}}</td>
+          <td class="previous" rowspan="4">{{audit.current_findings}}</td>
+        </tr>
+        <tr>
+          <td>Terdapat visual yang jelas pada tempat dokumen (bindex)</td>
+          <!-- <td class="score">{{audit.standardize_score}}</td> -->
+        </tr>
+        <tr>
+          <td>Dokumen disimpan sesual kapasitas tempat dokumen (bindex)</td>
+          <!-- <td class="score">{{audit.standardize_score}}</td> -->
+        </tr>
+        <tr>
+          <td>Tempat dokumen (bindex) dilempatkan dan disusun secara rapi</td>
+          <!-- <td class="score">{{audit.standardize_score}}</td> -->
+        </tr>
+
+        <tr>
+          <td class="category" rowspan="4">
+            SUSTAIN<br />Terus melakukan dan berupaya meningkatkan ke 4S
+            sebelumnya. Disiplin, bermotivasi untuk terus melakukan kebiasaan -
+            kebiasaan baik
+          </td>
+          <td>Adanya briefing harian/mingguan tentang 6S</td>
+          <!-- <td class="score">{{audit.sustain_score}}</td> -->
+          <td class="total" rowspan="4">{{audit.sustain_score}}</td>
+          <td class="previous" rowspan="4"></td>
+        </tr>
+        <tr>
+          <td>Karyawan mengetahui dan memahami definisi 6S</td>
+          <!-- <td class="score">{{audit.sustain_score}}</td> -->
+        </tr>
+        <tr>
+          <td>Improvement Temuan Sebelumnya</td>
+          <!-- <td class="score">{{audit.sustain_score}}</td> -->
+        </tr>
+        <tr>
+          <td>Pastikan semua area kerja dalam keadaan rapi dan bersih</td>
+          <!-- <td class="score">{{audit.sustain_score}}</td> -->
+        </tr>
+
+        <tr>
+          <td class="category" rowspan="4">
+            SAFETY<br />Peduli keselamatan, kesehatan kerja serta menciptakan lingkungan kerja yang aman dan nyaman
+          </td>
+          <td>Kabel-kabel tertata rapi</td>
+          <!-- <td class="score">{{audit.safety_score}}</td> -->
+          <td class="total" rowspan="4">{{audit.safety_score}}</td>
+          <td class="previous" rowspan="4"></td>
+        </tr>
+        <tr>
+          <td>Kabel-kabel tertata rapi dan dalam kondisi bolk (kabel tidak terkelupas, dll)</td>
+          <!-- <td class="score">{{audit.safety_score}}</td> -->
+        </tr>
+        <tr>
+          <td>
+            Jalur evakuasi tidak terhalang oleh apapun
+          </td>
+          <!-- <td class="score">{{audit.safety_score}}</td> -->
+        </tr>
+        <tr>
+          <td>Pastikan benda-benda di area kerja diletakkan dalam posisi aman dan tidak berpotensi menimpa seseorang</td>
+          <!-- <td class="score">{{audit.safety_score}}</td> -->
+        </tr>
+
+        <tr>
+          <td colspan="2" style="text-align: right; font-weight: bold">
+            Grand Total Score
+          </td>
+          <td class="score">{{grandTotalScore}}</td>
+          <td></td>
+        </tr>
+      </table>
+
+      <!-- <div class="signatures">
+        <div class="signature-box">
+          <div class="signature-title">Auditor</div>
+          <img src="{{audit.auditor_signature}}" alt="Auditor Signature" class="signature-img" />
+        </div>
+        <div class="signature-box">
+          <div class="signature-title">Department</div>
+        </div>
+        <div class="signature-box">
+          <div class="signature-title">Fasilitator</div>
+        </div>
+      </div> -->
+      <div class="signatures">
+        <div class="signature-box">
+          <img src="{{audit.auditor_signature}}" alt="Auditor Signature" class="signature-img" />
+          <div class="signature-title">Auditor</div>
+        </div>
+      
+        <div class="signature-box">
+          <img src="{{audit.department_signature}}" alt="Department Signature" class="signature-img" />
+          <div class="signature-title">Department</div>
+        </div>
+      
+        <div class="signature-box">
+          <img src="{{audit.facilitator_signature}}" alt="Facilitator Signature" class="signature-img" />
+          <div class="signature-title">Fasilitator</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

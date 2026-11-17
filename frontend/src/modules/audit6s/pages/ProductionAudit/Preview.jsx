@@ -74,128 +74,268 @@ export default function ProductionAuditPreview() {
 
   const downloadPdf = () => {
     const doc = new jsPDF({
-      orientation: "landscape",
+      orientation: "portrait",
       unit: "mm",
-      format: "a4"
+      format: "a4",
     })
 
-    // Title
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(16)
-    doc.text("LAPORAN AUDIT 6S - PRODUCTION", 14, 15)
+    const marginX = 10
+    const marginY = 10
+    const contentWidth = 190
+    const headerHeight = 22
 
+    const auditDateFormatted = audit.audit_date
+      ? new Date(audit.audit_date).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        })
+      : "-"
+
+    const grandTotalScore = (
+      ((Number(audit.sort_score) || 0) +
+        (Number(audit.set_in_order_score) || 0) +
+        (Number(audit.shine_score) || 0) +
+        (Number(audit.standardize_score) || 0) +
+        (Number(audit.sustain_score) || 0) +
+        (Number(audit.safety_score) || 0)) /
+      6
+    ).toFixed(2)
+
+    // Header layout matching TemplatePDFGENERATE6S/gen-pdf.html
+    const titleWidth = contentWidth * 0.56 // ~106.4mm
+    const infoWidth = contentWidth * 0.26 // ~49.4mm
+    const ratingWidth = contentWidth - titleWidth - infoWidth // ~34.2mm
+
+    doc.setDrawColor(0, 0, 0)
+    doc.setLineWidth(0.3)
+
+    // Header outer box & vertical dividers
+    doc.rect(marginX, marginY, contentWidth, headerHeight)
+    doc.line(marginX + titleWidth, marginY, marginX + titleWidth, marginY + headerHeight)
+    doc.line(marginX + titleWidth + infoWidth, marginY, marginX + titleWidth + infoWidth, marginY + headerHeight)
+
+    // Left Header: Main Title + horizontal divider + Audit Goal
+    doc.line(marginX, marginY + 9, marginX + titleWidth, marginY + 9)
+    doc.setFont("helvetica", "bold")
     doc.setFontSize(10)
+    doc.text("CHECKLIST AUDIT 6S PRODUCTION", marginX + titleWidth / 2, marginY + 6, { align: "center" })
+
+    doc.setFontSize(7.5)
+    const goalLines = doc.splitTextToSize(
+      "Audit Goal: Untuk Meng-Audit inisiatif dalam menyesuaikan dengan standar 6S, mengidentifikasi area dimana 6S dijaga dengan baik",
+      titleWidth - 6
+    )
+    doc.text(goalLines, marginX + titleWidth / 2, marginY + 13.5, { align: "center" })
+
+    // Middle Header: Area, Auditor, Periode
+    const infoX = marginX + titleWidth + 2.5
+    doc.setFontSize(7.5)
+    doc.setFont("helvetica", "bold")
+    doc.text("Area:", infoX, marginY + 6)
     doc.setFont("helvetica", "normal")
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 21)
-
-    // Info Table
-    const infoData = [
-      ["Department:", audit.Department?.name || "N/A", "Audit Date:", new Date(audit.audit_date).toLocaleDateString()],
-      ["Auditor Name:", audit.auditor_name || "N/A", "Lean Facilitator:", audit.lean_facilitator_name || "N/A"]
-    ]
-
-    doc.autoTable({
-      startY: 25,
-      head: [],
-      body: infoData,
-      theme: "plain",
-      styles: { cellPadding: 1, fontSize: 10 },
-      columnStyles: {
-        0: { fontStyle: "bold", width: 35 },
-        1: { width: 95 },
-        2: { fontStyle: "bold", width: 35 },
-        3: { width: 95 }
-      }
-    })
-
-    // Scores
-    const scores = [
-      ["1. SORT", audit.sort_score, "Pisahkan dan hilangkan segala sesuatu yang tidak diperlukan di area kerja"],
-      ["2. SET IN ORDER", audit.set_in_order_score, "Susun dan tempatkan dokumen dan perlengkapan kerja pada tempatnya"],
-      ["3. SHINE", audit.shine_score, "Susun dan tempatkan dokumen dan perlengkapan kerja pada tempatnya"],
-      ["4. STANDARDIZE", audit.standardize_score, "Susun dan tempatkan dokumen dan perlengkapan kerja pada tempatnya"],
-      ["5. SUSTAIN", audit.sustain_score, "Susun dan tempatkan dokumen dan perlengkapan kerja pada tempatnya"],
-      ["6. SAFETY", audit.safety_score, "Susun dan tempatkan dokumen dan perlengkapan kerja pada tempatnya"]
-    ]
-
-    const averageScore = ((
-      (audit.sort_score || 0) +
-      (audit.set_in_order_score || 0) +
-      (audit.shine_score || 0) +
-      (audit.standardize_score || 0) +
-      (audit.sustain_score || 0) +
-      (audit.safety_score || 0)
-    ) / 6).toFixed(2)
-
-    const scoreRows = scores.map(s => [s[0], s[1], s[2]])
-    scoreRows.push([
-      { content: "FINAL AVERAGE SCORE", colSpan: 1, styles: { fontStyle: "bold", fillColor: [230, 240, 255] } },
-      { content: averageScore, styles: { fontStyle: "bold", fillColor: [230, 240, 255] } },
-      { content: "", styles: { fillColor: [230, 240, 255] } }
-    ])
-
-    doc.autoTable({
-      startY: doc.lastAutoTable.finalY + 8,
-      head: [["Category", "Score", "Description"]],
-      body: scoreRows,
-      theme: "grid",
-      styles: { fontSize: 9 },
-      columnStyles: {
-        0: { fontStyle: "bold", width: 45 },
-        1: { halign: "center", width: 20 },
-        2: { width: 200 }
-      }
-    })
-
-    // Findings
-    const findingsData = [
-      ["Previous Findings:", audit.previous_findings || "No findings recorded"],
-      ["Current Findings:", audit.current_findings || "No findings recorded"]
-    ]
-
-    doc.autoTable({
-      startY: doc.lastAutoTable.finalY + 8,
-      head: [["Type", "Findings Details"]],
-      body: findingsData,
-      theme: "grid",
-      styles: { fontSize: 9 },
-      columnStyles: {
-        0: { fontStyle: "bold", width: 45 },
-        1: { width: 220 }
-      }
-    })
-
-    // Signatures
-    const sigY = doc.lastAutoTable.finalY + 10
-    
-    if (audit.auditor_signature) {
-      try {
-        doc.addImage(audit.auditor_signature, "PNG", 20, sigY + 5, 40, 15)
-      } catch (e) {
-        console.error("Auditor signature image draw failed", e)
-      }
-    }
-    if (audit.facilitator_signature) {
-      try {
-        doc.addImage(audit.facilitator_signature, "PNG", 110, sigY + 5, 40, 15)
-      } catch (e) {
-        console.error("Facilitator signature image draw failed", e)
-      }
-    }
-    if (audit.department_signature) {
-      try {
-        doc.addImage(audit.department_signature, "PNG", 200, sigY + 5, 40, 15)
-      } catch (e) {
-        console.error("Department head signature image draw failed", e)
-      }
-    }
+    doc.text(String(audit.Department?.name || "-"), infoX + 13, marginY + 6)
 
     doc.setFont("helvetica", "bold")
-    doc.text("Auditor", 40, sigY + 25, { align: "center" })
-    doc.text("Facilitator", 130, sigY + 25, { align: "center" })
-    doc.text("Department Head", 220, sigY + 25, { align: "center" })
+    doc.text("Auditor:", infoX, marginY + 12)
+    doc.setFont("helvetica", "normal")
+    doc.text(String(audit.auditor_name || "-"), infoX + 13, marginY + 12)
 
-    doc.save(`Audit_Report_Production_${audit.Department?.name || "Dept"}_${new Date(audit.audit_date).toISOString().slice(0, 10)}.pdf`)
+    doc.setFont("helvetica", "bold")
+    doc.text("Periode:", infoX, marginY + 18)
+    doc.setFont("helvetica", "normal")
+    doc.text(auditDateFormatted, infoX + 13, marginY + 18)
+
+    // Right Header: Rating Legend
+    const ratingX = marginX + titleWidth + infoWidth + 2
+    doc.setFontSize(6.5)
+    doc.setFont("helvetica", "normal")
+    doc.text("1 = SANGAT TIDAK BAIK", ratingX, marginY + 5.5)
+    doc.text("2 = TIDAK BAIK", ratingX, marginY + 10)
+    doc.text("3 = BAIK", ratingX, marginY + 14.5)
+    doc.text("4 = SANGAT BAIK", ratingX, marginY + 19)
+
+    // Checklist Table matching gen-pdf.html
+    const bodyRows = [
+      // SORT
+      [
+        {
+          content: "SORT\nPisahkan dan hilangkan segala sesuatu yang tidak diperlukan di area kerja",
+          rowSpan: 4,
+          styles: { fontStyle: "bold", valign: "middle" },
+        },
+        "Tidak ada barang-barang pribadi dilorong dan disudut-sudut area kerja",
+        { content: String(audit.sort_score ?? ""), rowSpan: 4, styles: { halign: "center", valign: "middle" } },
+        { content: String(audit.previous_findings || ""), rowSpan: 4, styles: { halign: "center", valign: "middle" } },
+      ],
+      ["Semua barang pribadi yang tidak ada hubungannya dengan pekerjaan harus disimpan pada tempatnya."],
+      ["Semua mesin yang tidak diperlukan harus ada visual yang jelas"],
+      ["Semua peralatan kerja yang sudah tidak digunakan disimpan pada tempatnya"],
+
+      // SET IN ORDER
+      [
+        {
+          content: "SET IN ORDER\nSusun dan tempatkan dokumen dan perlengkapan kerja pada tempatnya",
+          rowSpan: 4,
+          styles: { fontStyle: "bold", valign: "middle" },
+        },
+        "Tempat Khusus untuk material dan perlengkapan kerja harus jelas",
+        { content: String(audit.set_in_order_score ?? ""), rowSpan: 4, styles: { halign: "center", valign: "middle" } },
+        { content: "", rowSpan: 4 },
+      ],
+      ["Material dan perlengkapan kerja diletakkan pada tempatnya"],
+      ["Penempatan material dan perlengkapan kerja disusun secara rapih"],
+      ["Penempatan material dan perlengkapan kerja berada dalam area kerja (dalam garis line)"],
+
+      // SHINE
+      [
+        {
+          content: "SHINE\nSegala sesuatu terjaga kebersihannya",
+          rowSpan: 4,
+          styles: { fontStyle: "bold", valign: "middle" },
+        },
+        "Material bersih dari debu, sisa material/scrap dan oli",
+        { content: String(audit.shine_score ?? ""), rowSpan: 4, styles: { halign: "center", valign: "middle" } },
+        { content: "", rowSpan: 3 },
+      ],
+      ["Lantai, dinding, mesin dan perlengkapan kerja bebas debu, oli, sampah dan sarang laba-laba"],
+      ["Tersedianya alat kebersihan disetiap area kerja dalam kondisi baik dan berfungsi."],
+      [
+        "Kondisi garis, Label, Petunjuk, Visual display dll. Bersih dan tidak rusak",
+        { content: "Temuan Sekarang", styles: { halign: "center", valign: "middle", fontStyle: "bold" } },
+      ],
+
+      // STANDARDIZED
+      [
+        {
+          content: "STANDARDIZED\nTempatkan dokumen diarea yang sudah ditetapkan dengan jumlah sesuai batas minimal dan maximal",
+          rowSpan: 4,
+          styles: { fontStyle: "bold", valign: "middle" },
+        },
+        "Semua standar kerja atau proses diketahui dan terlihat jelas. (Kelengkapan SOP)",
+        { content: String(audit.standardize_score ?? ""), rowSpan: 4, styles: { halign: "center", valign: "middle" } },
+        { content: String(audit.current_findings || ""), rowSpan: 4, styles: { halign: "center", valign: "middle" } },
+      ],
+      ["Pastikan semua sistem dijalankan dan terupdate"],
+      ["Semua perlengkapan kerja yang digunakan sesuai dengan standar yang ditentukan"],
+      ["Tempatkan material di area yang telah ditetapkan dengan jumlah sesual batas minimal dan maksimal"],
+
+      // SUSTAIN
+      [
+        {
+          content:
+            "SUSTAIN\nTerus melakukan dan berupaya meningkatkan ke 4S sebelumnya. Disiplin, bermotivasi untuk terus melakukan kebiasaan - kebiasaan baik",
+          rowSpan: 4,
+          styles: { fontStyle: "bold", valign: "middle" },
+        },
+        "Dilaksanakan briefing harian/mingguan tentang 6S",
+        { content: String(audit.sustain_score ?? ""), rowSpan: 4, styles: { halign: "center", valign: "middle" } },
+        { content: "", rowSpan: 4 },
+      ],
+      ["Karyawan mengetahui dan memahami definisi 6S"],
+      ["Improvement Temuan Sebelumnya"],
+      ["Pastikan semua area kerja dalam keadaan rapi dan bersih"],
+
+      // SAFETY
+      [
+        {
+          content: "SAFETY\nPeduli keselamatan, kesehatan kerja serta menciptakan lingkungan kerja yang aman dan nyaman",
+          rowSpan: 4,
+          styles: { fontStyle: "bold", valign: "middle" },
+        },
+        "Karyawan yang posisi kerjanya di area berbahaya harus selalu menggunakan APD sesuai dengan ketentuan yang berlaku (diarea bising, area pengeleman, area press dll).",
+        { content: String(audit.safety_score ?? ""), rowSpan: 4, styles: { halign: "center", valign: "middle" } },
+        { content: "", rowSpan: 4 },
+      ],
+      ["Setiap penyimpanan bahan kimia harus menggunakan secondary containment."],
+      ["Setiap menggunakan bahan kimia berbahaya maka harus disertai MSDS"],
+      ["Setiap mesin harus memiliki tombol emergency dan pengaman mesin; sellap gunting harus diikat"],
+
+      // Grand Total Score
+      [
+        { content: "Grand Total Score", colSpan: 2, styles: { halign: "right", fontStyle: "bold", valign: "middle" } },
+        { content: grandTotalScore, styles: { halign: "center", fontStyle: "bold", valign: "middle" } },
+        "",
+      ],
+    ]
+
+    doc.autoTable({
+      startY: marginY + headerHeight,
+      margin: { left: marginX, right: marginX },
+      tableWidth: contentWidth,
+      head: [["KATEGORI", "Standar Criteria", "Total Score", "Temuan Sebelumnya"]],
+      body: bodyRows,
+      theme: "grid",
+      styles: {
+        font: "helvetica",
+        fontSize: 7,
+        cellPadding: 1.4,
+        textColor: [0, 0, 0],
+        lineColor: [0, 0, 0],
+        lineWidth: 0.25,
+        valign: "middle",
+      },
+      headStyles: {
+        fillColor: [242, 242, 242],
+        textColor: [0, 0, 0],
+        fontStyle: "bold",
+        lineColor: [0, 0, 0],
+        lineWidth: 0.25,
+      },
+      columnStyles: {
+        0: { cellWidth: contentWidth * 0.16 },
+        1: { cellWidth: contentWidth * 0.52 },
+        2: { cellWidth: contentWidth * 0.12, halign: "center" },
+        3: { cellWidth: contentWidth * 0.20, halign: "center" },
+      },
+    })
+
+    // Signatures Section (3 boxes on bottom right matching gen-pdf.html)
+    const sigTopY = doc.lastAutoTable.finalY + 5
+    const boxWidth = 42
+    const boxHeight = 26
+    const boxGap = 3
+    const totalSigWidth = boxWidth * 3 + boxGap * 2
+    const startSigX = marginX + contentWidth - totalSigWidth - 3
+
+    const sigItems = [
+      { label: "Auditor", image: audit.auditor_signature },
+      { label: "Department", image: audit.department_signature },
+      { label: "Fasilitator", image: audit.facilitator_signature },
+    ]
+
+    sigItems.forEach((item, idx) => {
+      const boxX = startSigX + idx * (boxWidth + boxGap)
+      doc.setDrawColor(0, 0, 0)
+      doc.setLineWidth(0.25)
+      doc.rect(boxX, sigTopY, boxWidth, boxHeight)
+
+      // Image area
+      if (item.image) {
+        try {
+          doc.addImage(item.image, "PNG", boxX + 3, sigTopY + 1.5, boxWidth - 6, boxHeight - 9)
+        } catch (e) {
+          console.error(`${item.label} signature draw failed`, e)
+        }
+      }
+
+      // Title line at bottom of signature box
+      const titleLineY = sigTopY + boxHeight - 6
+      doc.line(boxX + 1.5, titleLineY, boxX + boxWidth - 1.5, titleLineY)
+      doc.setFont("helvetica", "bold")
+      doc.setFontSize(8)
+      doc.text(item.label, boxX + boxWidth / 2, sigTopY + boxHeight - 2, { align: "center" })
+    })
+
+    // Outer checklist-container border
+    const containerHeight = sigTopY + boxHeight + 4 - marginY
+    doc.setDrawColor(0, 0, 0)
+    doc.setLineWidth(0.35)
+    doc.rect(marginX, marginY, contentWidth, containerHeight)
+
+    doc.save(
+      `Audit_Report_Production_${audit.Department?.name || "Dept"}_${new Date(audit.audit_date).toISOString().slice(0, 10)}.pdf`
+    )
   }
   return (
     <Card shadow="sm" padding="lg">
