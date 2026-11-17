@@ -42,7 +42,7 @@ class EmployeeRepository
     {
         $skillCountSql = $this->getSkillCountSql();
         $builder = $this->db->table('employees')
-            ->select("*, {$skillCountSql} as total_skill, (CASE WHEN {$skillCountSql} >= 3 THEN 'YES' ELSE 'NO' END) as is_multiskill");
+            ->select("*, {$skillCountSql} as total_skill, (CASE WHEN {$skillCountSql} >= 2 THEN 'YES' ELSE 'NO' END) as is_multiskill");
 
         if (!empty($filters['search'])) {
             $builder->groupStart()
@@ -104,7 +104,7 @@ class EmployeeRepository
     {
         $skillCountSql = $this->getSkillCountSql();
         return $this->db->table('employees')
-            ->select("*, {$skillCountSql} as total_skill, (CASE WHEN {$skillCountSql} >= 3 THEN 'YES' ELSE 'NO' END) as is_multiskill")
+            ->select("*, {$skillCountSql} as total_skill, (CASE WHEN {$skillCountSql} >= 2 THEN 'YES' ELSE 'NO' END) as is_multiskill")
             ->where('id', $id)
             ->get()
             ->getRowArray();
@@ -114,7 +114,7 @@ class EmployeeRepository
     {
         $skillCountSql = $this->getSkillCountSql();
         return $this->db->table('employees')
-            ->select("*, {$skillCountSql} as total_skill, (CASE WHEN {$skillCountSql} >= 3 THEN 'YES' ELSE 'NO' END) as is_multiskill")
+            ->select("*, {$skillCountSql} as total_skill, (CASE WHEN {$skillCountSql} >= 2 THEN 'YES' ELSE 'NO' END) as is_multiskill")
             ->where('nik', $nik)
             ->get()
             ->getRowArray();
@@ -147,10 +147,10 @@ class EmployeeRepository
         $totalActive = $this->db->table('employees')->where('status', 'Active')->countAllResults();
         $totalAll = $this->db->table('employees')->countAllResults();
 
-        // 2. Total Multi Skill employees (Active, skills >= 3)
+        // 2. Total Multi Skill employees (Active, skills >= 2)
         $totalMultiskill = $this->db->table('employees')
             ->where('status', 'Active')
-            ->where("{$skillCountSql} >=", 3)
+            ->where("{$skillCountSql} >=", 2)
             ->countAllResults();
 
         // 3. Multi Skill Percentage
@@ -176,7 +176,7 @@ class EmployeeRepository
         $lineQuery = "
             SELECT line,
                    COUNT(*) as total_count,
-                   SUM(CASE WHEN {$skillCountSql} >= 3 THEN 1 ELSE 0 END) as multiskill_count
+                   SUM(CASE WHEN {$skillCountSql} >= 2 THEN 1 ELSE 0 END) as multiskill_count
             FROM employees
             WHERE status = 'Active' AND line IS NOT NULL AND line != ''
             GROUP BY line
@@ -216,7 +216,7 @@ class EmployeeRepository
         $sectionQuery = "
             SELECT section,
                    COUNT(*) as total_count,
-                   SUM(CASE WHEN {$skillCountSql} >= 3 THEN 1 ELSE 0 END) as multiskill_count
+                   SUM(CASE WHEN {$skillCountSql} >= 2 THEN 1 ELSE 0 END) as multiskill_count
             FROM employees
             WHERE status = 'Active' AND section IS NOT NULL AND section != ''
             GROUP BY section

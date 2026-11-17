@@ -141,7 +141,7 @@ export default function KaizenSubmissionForm() {
       })
 
       // Set photo previews
-      const baseUrl = api.defaults.baseURL.replace("/api", "")
+      const baseUrl = api.defaults.baseURL.replace(/(\/index\.php)?\/api.*$/, "")
 
       // Handle before photos
       if (submission.photos_before && submission.photos_before.length > 0) {
@@ -193,7 +193,7 @@ export default function KaizenSubmissionForm() {
     try {
       if (type === "before") {
         // Check if this is an existing photo from the server
-        const baseUrl = api.defaults.baseURL.replace("/api", "")
+        const baseUrl = api.defaults.baseURL.replace(/(\/index\.php)?\/api.*$/, "")
         const preview = photosBeforePreviews[index]
         const isExistingPhoto = preview.startsWith(baseUrl)
 
@@ -230,7 +230,7 @@ export default function KaizenSubmissionForm() {
         setPhotosBeforePreviews((prev) => prev.filter((_, i) => i !== index))
       } else {
         // After photos - same logic as above
-        const baseUrl = api.defaults.baseURL.replace("/api", "")
+        const baseUrl = api.defaults.baseURL.replace(/(\/index\.php)?\/api.*$/, "")
         const preview = photosAfterPreviews[index]
         const isExistingPhoto = preview.startsWith(baseUrl)
 

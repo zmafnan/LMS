@@ -121,7 +121,7 @@ export default function KaizenMasterDataDetail() {
     })
   }
 
-  const baseUrl = api.defaults.baseURL.replace("/api", "")
+  const baseUrl = api.defaults.baseURL.replace(/(\/index\.php)?\/api.*$/, "")
 
   return (
     <Container size="md" py="xl">

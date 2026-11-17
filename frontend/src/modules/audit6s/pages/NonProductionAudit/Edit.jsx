@@ -55,6 +55,7 @@ export default function NonProductionAuditQuickEdit() {
     } else {
       baseUrl = ""
     }
+    baseUrl = baseUrl.replace(/\/index\.php\/?$/, "")
     const cleanPath = photo.startsWith("/") ? photo : `/${photo}`
     return `${baseUrl}${cleanPath}`
   }
@@ -113,7 +114,7 @@ export default function NonProductionAuditQuickEdit() {
     formData.append("existing_photos", JSON.stringify(photos))
 
     newPhotos.forEach((photo) => {
-      formData.append("photos", photo)
+      formData.append("photos[]", photo)
     })
 
     try {

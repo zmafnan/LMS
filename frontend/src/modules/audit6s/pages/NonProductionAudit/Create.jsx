@@ -179,19 +179,22 @@ export default function NonProductionAuditCreate() {
     }
   }
 
-  // Add this helper function after handleScheduleChange
+  // Helper function to resolve photo URL
   const getPhotoUrl = (photoUrl) => {
-    // Get base URL without /api suffix if present
-    const baseUrl = api.defaults.baseURL?.endsWith("/api")
-      ? api.defaults.baseURL.slice(0, -4)
-      : api.defaults.baseURL || ""
-
-    // Handle different URL formats
-    if (photoUrl.startsWith("http")) {
+    if (!photoUrl) return "/placeholder.svg"
+    if (photoUrl.startsWith("http://") || photoUrl.startsWith("https://") || photoUrl.startsWith("data:")) {
       return photoUrl
-    } else {
-      return `${baseUrl}${photoUrl}`
     }
+    let baseUrl = api.defaults.baseURL || ""
+    const apiIndex = baseUrl.indexOf("/api")
+    if (apiIndex !== -1) {
+      baseUrl = baseUrl.substring(0, apiIndex)
+    } else {
+      baseUrl = ""
+    }
+    baseUrl = baseUrl.replace(/\/index\.php\/?$/, "")
+    const cleanPath = photoUrl.startsWith("/") ? photoUrl : `/${photoUrl}`
+    return `${baseUrl}${cleanPath}`
   }
 
   // Tambahkan state untuk preview foto
@@ -303,7 +306,7 @@ export default function NonProductionAuditCreate() {
 
       // Append photos
       formData.photos.forEach((photo) => {
-        formDataToSend.append("photos", photo)
+        formDataToSend.append("photos[]", photo)
       })
 
       // Save audit data to database

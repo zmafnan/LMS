@@ -7,7 +7,9 @@ import { getCategories, getUsers } from '../../services/masterService'
 import { BarChart3, FileDown, Calendar, Filter } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
-import 'jspdf-autotable'
+import { applyPlugin } from 'jspdf-autotable'
+
+applyPlugin(jsPDF)
 import { useThemeColors } from '../../hooks/useThemeColors'
 
 export default function ReportsPage() {

@@ -15,6 +15,24 @@ class Home extends BaseController
             return redirect()->to('/react/');
         }
 
+        // If a static upload file is requested through index.php (e.g., /public/index.php/uploads/...),
+        // serve the file directly from public/uploads/ instead of returning the SPA HTML.
+        $uploadsPos = strpos($uri, 'uploads/');
+        if ($uploadsPos !== false) {
+            $relativeUploadPath = substr($uri, $uploadsPos);
+            $uploadsBaseDir = realpath(FCPATH . 'uploads');
+            $filePath = realpath(FCPATH . $relativeUploadPath);
+
+            if ($uploadsBaseDir && $filePath && strpos($filePath, $uploadsBaseDir) === 0 && is_file($filePath)) {
+                $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+                return $this->response
+                    ->setHeader('Content-Type', $mimeType)
+                    ->setBody(file_get_contents($filePath));
+            }
+
+            return $this->response->setStatusCode(404, 'File Not Found');
+        }
+
         $path = FCPATH . 'react/index.html';
         
         if (!file_exists($path)) {

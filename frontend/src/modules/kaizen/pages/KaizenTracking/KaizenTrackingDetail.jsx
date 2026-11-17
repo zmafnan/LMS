@@ -311,7 +311,7 @@ export default function KaizenTrackingDetail() {
                   {submission.photos_before && submission.photos_before.length > 0 ? (
                     <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                       {submission.photos_before.map((url, index) => {
-                        const fullUrl = `${api.defaults.baseURL.replace("/api", "")}${url}`
+                        const fullUrl = `${api.defaults.baseURL.replace(/(\/index\.php)?\/api.*$/, "")}${url}`
                         return (
                           <Box key={index} style={{ position: "relative" }}>
                             <Image
@@ -350,7 +350,7 @@ export default function KaizenTrackingDetail() {
                   {submission.photos_after && submission.photos_after.length > 0 ? (
                     <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                       {submission.photos_after.map((url, index) => {
-                        const fullUrl = `${api.defaults.baseURL.replace("/api", "")}${url}`
+                        const fullUrl = `${api.defaults.baseURL.replace(/(\/index\.php)?\/api.*$/, "")}${url}`
                         return (
                           <Box key={index} style={{ position: "relative" }}>
                             <Image

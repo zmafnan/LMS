@@ -7,13 +7,17 @@ const api = {
   },
   post: async (url, data, config) => {
     // If data is FormData, let Axios automatically set multipart/form-data with boundary
-    const headers = data instanceof FormData ? {} : { 'Content-Type': 'application/json' };
-    const res = await axiosClient.post(`/audit6s${url}`, data, { ...config, headers: { ...headers, ...config?.headers } });
+    const headers = data instanceof FormData
+      ? { ...config?.headers, 'Content-Type': undefined }
+      : { 'Content-Type': 'application/json', ...config?.headers };
+    const res = await axiosClient.post(`/audit6s${url}`, data, { ...config, headers });
     return { data: res };
   },
   put: async (url, data, config) => {
-    const headers = data instanceof FormData ? {} : { 'Content-Type': 'application/json' };
-    const res = await axiosClient.put(`/audit6s${url}`, data, { ...config, headers: { ...headers, ...config?.headers } });
+    const headers = data instanceof FormData
+      ? { ...config?.headers, 'Content-Type': undefined }
+      : { 'Content-Type': 'application/json', ...config?.headers };
+    const res = await axiosClient.put(`/audit6s${url}`, data, { ...config, headers });
     return { data: res };
   },
   delete: async (url, config) => {

@@ -171,6 +171,23 @@ export default function ProductionAuditCreate() {
 
   const [previousAuditPhotos, setPreviousAuditPhotos] = useState([])
 
+  const getPhotoUrl = (photoUrl) => {
+    if (!photoUrl) return "/placeholder.svg"
+    if (photoUrl.startsWith("http://") || photoUrl.startsWith("https://") || photoUrl.startsWith("data:")) {
+      return photoUrl
+    }
+    let baseUrl = api.defaults.baseURL || ""
+    const apiIndex = baseUrl.indexOf("/api")
+    if (apiIndex !== -1) {
+      baseUrl = baseUrl.substring(0, apiIndex)
+    } else {
+      baseUrl = ""
+    }
+    baseUrl = baseUrl.replace(/\/index\.php\/?$/, "")
+    const cleanPath = photoUrl.startsWith("/") ? photoUrl : `/${photoUrl}`
+    return `${baseUrl}${cleanPath}`
+  }
+
   const handleScheduleChange = async (scheduleId) => {
     const selectedSchedule = schedules.find((s) => s.value === scheduleId)?.schedule
     if (selectedSchedule) {
@@ -382,7 +399,7 @@ export default function ProductionAuditCreate() {
 
       // Append photos
       formData.photos.forEach((photo) => {
-        formDataToSend.append("photos", photo)
+        formDataToSend.append("photos[]", photo)
       })
 
       // Save audit data to database
@@ -744,11 +761,7 @@ export default function ProductionAuditCreate() {
                             {previousAuditPhotos.map((photoUrl, index) => (
                               <div key={index} style={{ position: "relative" }}>
                                 <Image
-                                  src={
-                                    photoUrl.startsWith("http")
-                                      ? photoUrl
-                                      : `${api.defaults.baseURL.replace("/api", "")}${photoUrl}` || "/placeholder.svg"
-                                  }
+                                  src={getPhotoUrl(photoUrl)}
                                   alt={`Previous finding ${index + 1}`}
                                   radius="md"
                                   style={{ width: "100%", height: "auto", maxHeight: "200px", objectFit: "cover" }}

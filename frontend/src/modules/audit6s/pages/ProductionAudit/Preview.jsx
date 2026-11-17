@@ -5,9 +5,11 @@ import { useParams } from "react-router-dom"
 import { Card, Title, Text, Stack, Group, Badge, Image, Button, Paper, SimpleGrid } from "@mantine/core"
 import { notifications } from "@mantine/notifications"
 import jsPDF from "jspdf"
-import "jspdf-autotable"
+import { applyPlugin } from "jspdf-autotable"
 import api from "../../services/api"
 import { IconDownload } from "@tabler/icons-react"
+
+applyPlugin(jsPDF)
 
 export default function ProductionAuditPreview() {
   const { id } = useParams()
@@ -65,6 +67,7 @@ export default function ProductionAuditPreview() {
     } else {
       baseUrl = ""
     }
+    baseUrl = baseUrl.replace(/\/index\.php\/?$/, "")
     const cleanPath = photo.startsWith("/") ? photo : `/${photo}`
     return `${baseUrl}${cleanPath}`
   }

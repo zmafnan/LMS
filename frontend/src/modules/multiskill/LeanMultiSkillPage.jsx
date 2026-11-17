@@ -11,7 +11,9 @@ import {
 } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
-import 'jspdf-autotable'
+import { applyPlugin } from 'jspdf-autotable'
+
+applyPlugin(jsPDF)
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell 
 } from 'recharts'
@@ -1121,7 +1123,7 @@ export default function LeanMultiSkillPage() {
                 <Group key={num} grow preventGrowOverflow={false} wrap="nowrap" align="flex-end">
                   <TextInput
                     label={`Skill ${num}`}
-                    placeholder={num <= 3 ? "Required Competency" : "Additional Skill"}
+                    placeholder={num <= 2 ? "Required Competency" : "Additional Skill"}
                     style={{ flex: 1 }}
                     {...form.getInputProps(`skill_${num}`)}
                   />
