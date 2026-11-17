@@ -71,15 +71,15 @@ export default function NonProductionAuditPreview() {
   }
   const downloadPdf = () => {
     const doc = new jsPDF({
-      orientation: "portrait",
+      orientation: "landscape",
       unit: "mm",
       format: "a4",
     })
 
-    const marginX = 10
-    const marginY = 10
-    const contentWidth = 190
-    const headerHeight = 22
+    const marginX = 8
+    const marginY = 6
+    const contentWidth = 281
+    const headerHeight = 15
 
     const auditDateFormatted = audit.audit_date
       ? new Date(audit.audit_date).toLocaleDateString("id-ID", {
@@ -99,9 +99,9 @@ export default function NonProductionAuditPreview() {
       6
     ).toFixed(2)
 
-    // Header layout matching TemplatePDFGENERATE6S/gen-pdf-non.html
-    const titleWidth = contentWidth * 0.56
-    const infoWidth = contentWidth * 0.26
+    // Header layout matching TemplatePDFGENERATE6S/gen-pdf-non.html (60% | 25% | 15%)
+    const titleWidth = contentWidth * 0.60
+    const infoWidth = contentWidth * 0.25
     const ratingWidth = contentWidth - titleWidth - infoWidth
 
     doc.setDrawColor(0, 0, 0)
@@ -113,44 +113,44 @@ export default function NonProductionAuditPreview() {
     doc.line(marginX + titleWidth + infoWidth, marginY, marginX + titleWidth + infoWidth, marginY + headerHeight)
 
     // Left Header: Main Title + horizontal divider + Audit Goal
-    doc.line(marginX, marginY + 9, marginX + titleWidth, marginY + 9)
+    doc.line(marginX, marginY + 6.5, marginX + titleWidth, marginY + 6.5)
     doc.setFont("helvetica", "bold")
     doc.setFontSize(9.5)
-    doc.text("CHECKLIST AUDIT 6S OFFICE/NON PRODUCTION", marginX + titleWidth / 2, marginY + 6, { align: "center" })
+    doc.text("CHECKLIST AUDIT 6S OFFICE/NON PRODUCTION", marginX + titleWidth / 2, marginY + 4.5, { align: "center" })
 
-    doc.setFontSize(7.5)
+    doc.setFontSize(7)
     const goalLines = doc.splitTextToSize(
       "Audit Goal: Untuk Meng-Audit inisiatif dalam menyesuaikan dengan standar 6S, mengidentifikasi area dimana 6S dijaga dengan baik",
       titleWidth - 6
     )
-    doc.text(goalLines, marginX + titleWidth / 2, marginY + 13.5, { align: "center" })
+    doc.text(goalLines, marginX + titleWidth / 2, marginY + 10.2, { align: "center" })
 
     // Middle Header: Area, Auditor, Periode
     const infoX = marginX + titleWidth + 2.5
-    doc.setFontSize(7.5)
+    doc.setFontSize(7)
     doc.setFont("helvetica", "bold")
-    doc.text("Area:", infoX, marginY + 6)
+    doc.text("Area:", infoX, marginY + 4.5)
     doc.setFont("helvetica", "normal")
-    doc.text(String(audit.Department?.name || "-"), infoX + 13, marginY + 6)
+    doc.text(String(audit.Department?.name || "-"), infoX + 13, marginY + 4.5)
 
     doc.setFont("helvetica", "bold")
-    doc.text("Auditor:", infoX, marginY + 12)
+    doc.text("Auditor:", infoX, marginY + 9)
     doc.setFont("helvetica", "normal")
-    doc.text(String(audit.auditor_name || "-"), infoX + 13, marginY + 12)
+    doc.text(String(audit.auditor_name || "-"), infoX + 13, marginY + 9)
 
     doc.setFont("helvetica", "bold")
-    doc.text("Periode:", infoX, marginY + 18)
+    doc.text("Periode:", infoX, marginY + 13.5)
     doc.setFont("helvetica", "normal")
-    doc.text(auditDateFormatted, infoX + 13, marginY + 18)
+    doc.text(auditDateFormatted, infoX + 13, marginY + 13.5)
 
     // Right Header: Rating Legend
-    const ratingX = marginX + titleWidth + infoWidth + 2
-    doc.setFontSize(6.5)
+    const ratingX = marginX + titleWidth + infoWidth + 2.5
+    doc.setFontSize(6.3)
     doc.setFont("helvetica", "normal")
-    doc.text("1 = SANGAT TIDAK BAIK", ratingX, marginY + 5.5)
-    doc.text("2 = TIDAK BAIK", ratingX, marginY + 10)
-    doc.text("3 = BAIK", ratingX, marginY + 14.5)
-    doc.text("4 = SANGAT BAIK", ratingX, marginY + 19)
+    doc.text("1 = SANGAT TIDAK BAIK", ratingX, marginY + 3.8)
+    doc.text("2 = TIDAK BAIK", ratingX, marginY + 7.2)
+    doc.text("3 = BAIK", ratingX, marginY + 10.6)
+    doc.text("4 = SANGAT BAIK", ratingX, marginY + 14)
 
     // Checklist Table matching gen-pdf-non.html
     const bodyRows = [
@@ -258,15 +258,16 @@ export default function NonProductionAuditPreview() {
 
     doc.autoTable({
       startY: marginY + headerHeight,
-      margin: { left: marginX, right: marginX },
+      margin: { left: marginX, right: marginX, bottom: 5 },
       tableWidth: contentWidth,
+      rowPageBreak: "avoid",
       head: [["KATEGORI", "Standar Criteria", "Total Score", "Temuan Sebelumnya"]],
       body: bodyRows,
       theme: "grid",
       styles: {
         font: "helvetica",
-        fontSize: 7,
-        cellPadding: 1.4,
+        fontSize: 6.3,
+        cellPadding: 0.9,
         textColor: [0, 0, 0],
         lineColor: [0, 0, 0],
         lineWidth: 0.25,
@@ -280,17 +281,17 @@ export default function NonProductionAuditPreview() {
         lineWidth: 0.25,
       },
       columnStyles: {
-        0: { cellWidth: contentWidth * 0.16 },
-        1: { cellWidth: contentWidth * 0.52 },
+        0: { cellWidth: contentWidth * 0.18 },
+        1: { cellWidth: contentWidth * 0.50 },
         2: { cellWidth: contentWidth * 0.12, halign: "center" },
         3: { cellWidth: contentWidth * 0.20, halign: "center" },
       },
     })
 
     // Signatures Section (3 boxes on bottom right matching gen-pdf-non.html)
-    const sigTopY = doc.lastAutoTable.finalY + 5
-    const boxWidth = 42
-    const boxHeight = 26
+    const sigTopY = doc.lastAutoTable.finalY + 3
+    const boxWidth = 52
+    const boxHeight = 20
     const boxGap = 3
     const totalSigWidth = boxWidth * 3 + boxGap * 2
     const startSigX = marginX + contentWidth - totalSigWidth - 3
@@ -310,22 +311,22 @@ export default function NonProductionAuditPreview() {
       // Image area
       if (item.image) {
         try {
-          doc.addImage(item.image, "PNG", boxX + 3, sigTopY + 1.5, boxWidth - 6, boxHeight - 9)
+          doc.addImage(item.image, "PNG", boxX + 4, sigTopY + 1, boxWidth - 8, boxHeight - 6.5)
         } catch (e) {
           console.error(`${item.label} signature draw failed`, e)
         }
       }
 
       // Title line at bottom of signature box
-      const titleLineY = sigTopY + boxHeight - 6
+      const titleLineY = sigTopY + boxHeight - 4.8
       doc.line(boxX + 1.5, titleLineY, boxX + boxWidth - 1.5, titleLineY)
       doc.setFont("helvetica", "bold")
-      doc.setFontSize(8)
-      doc.text(item.label, boxX + boxWidth / 2, sigTopY + boxHeight - 2, { align: "center" })
+      doc.setFontSize(7.5)
+      doc.text(item.label, boxX + boxWidth / 2, sigTopY + boxHeight - 1.4, { align: "center" })
     })
 
     // Outer checklist-container border
-    const containerHeight = sigTopY + boxHeight + 4 - marginY
+    const containerHeight = sigTopY + boxHeight + 3 - marginY
     doc.setDrawColor(0, 0, 0)
     doc.setLineWidth(0.35)
     doc.rect(marginX, marginY, contentWidth, containerHeight)
